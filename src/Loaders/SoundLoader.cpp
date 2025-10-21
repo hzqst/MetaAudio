@@ -233,5 +233,6 @@ namespace MetaAudio
     {
       Sys_Error("S_LoadSound Error: %s", e.what());
     }
+    return nullptr;
   }
 }

@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?> 
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!-- PostBuildEvent for MetaAudio project in Debug|Win32 configuration -->
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32' and '$(ProjectName)'=='MetaAudio'">
+    <PostBuildEvent>
+      <Command>
+        if exist "$(MetaHookGameDirectory)$(MetaHookModName)\metahook\plugins" if not "$(MetaHookGameDirectory)" == "" copy "$(OutDir)$(TargetName)$(TargetExt)" "$(MetaHookGameDirectory)$(MetaHookModName)\metahook\plugins\" /y
+      </Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+
+  <!-- PostBuildEvent for sndfile project in Debug|Win32 configuration -->
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32' and '$(ProjectName)'=='sndfile'">
+    <PostBuildEvent>
+      <Command>
+        if exist "$(MetaHookGameDirectory)$(MetaHookModName)\metahook\dlls" if not "$(MetaHookGameDirectory)" == "" copy "$(OutDir)$(TargetName)$(TargetExt)" "$(MetaHookGameDirectory)$(MetaHookModName)\metahook\dlls\" /y
+      </Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+
+</Project>

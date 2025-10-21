@@ -43,7 +43,7 @@ jobs:
         shell: cmd
 
       - name: Create Output directory
-        run: 
+        run: |
           mkdir "Build-Output"
           mkdir "Build-Output\metahook"
           mkdir "Build-Output\metahook\plugins"

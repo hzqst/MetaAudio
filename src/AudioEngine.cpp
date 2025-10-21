@@ -109,6 +109,7 @@ namespace MetaAudio
     {
       Sys_Error("S_FindName Error: %s", e.what());
     }
+    return nullptr;
   }
 
   void AudioEngine::S_CheckWavEnd(aud_channel_t* ch, aud_sfxcache_t* sc)

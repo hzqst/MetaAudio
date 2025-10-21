@@ -70,6 +70,19 @@ add_library(MetaAudio SHARED ${SOURCES} ${HEADERS})
 
 set_property(TARGET MetaAudio PROPERTY CXX_STANDARD 17)
 
+# Copy MSVC configuration files to build directory for Visual Studio projects
+if(MSVC)
+    set(MSVC_CONFIG_FILES
+        "${PROJECT_SOURCE_DIR}/msvc/Directory.build.props"
+        "${PROJECT_SOURCE_DIR}/msvc/Directory.build.targets"
+        "${PROJECT_SOURCE_DIR}/msvc/MetaHookSv.props"
+    )
+    foreach(CONFIG_FILE ${MSVC_CONFIG_FILES})
+        get_filename_component(FILE_NAME ${CONFIG_FILE} NAME)
+        configure_file(${CONFIG_FILE} "${CMAKE_BINARY_DIR}/${FILE_NAME}" COPYONLY)
+    endforeach()
+endif()
+
 target_compile_definitions(MetaAudio PRIVATE AUDIO_EXPORTS)
 add_compile_definitions(NOMINMAX PICOJSON_USE_INT64)
 
@@ -90,6 +103,7 @@ target_include_directories(MetaAudio
 )
 
 # Alure requires OpenAL
+set(OPENAL_BINARY ${PROJECT_SOURCE_DIR}/externals/OpenAL-SDK/bin/Win32/OpenAL32.dll)
 set(OPENAL_LIBRARY ${PROJECT_SOURCE_DIR}/externals/OpenAL-SDK/libs/Win32/OpenAL32.lib)
 set(OPENAL_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/externals/OpenAL-SDK/include)
 
@@ -126,9 +140,14 @@ add_dependencies(MetaAudio ${ALURE2_LIBRARY})
 
 target_link_libraries(MetaAudio PRIVATE ${OPENAL_LIBRARY} ${ALURE2_LIBRARY} sndfile)
 
-# Install MetaAudio.dll and libsndfile.dll to bin directory
+# Install MetaAudio.dll, libsndfile.dll and OpenAL32.dll to bin directory
 install(TARGETS MetaAudio sndfile
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
+)
+
+# Install OpenAL32.dll
+install(FILES ${OPENAL_BINARY}
+    DESTINATION bin
 )

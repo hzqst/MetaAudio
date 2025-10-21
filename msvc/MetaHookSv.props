@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup Condition="exists('$(SolutionDir)..\MetaHook.sln')">
+    <MetaHookBaseDir>$(SolutionDir)..\</MetaHookBaseDir>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="exists('$(SolutionDir)..\externals\MetaHookSv\MetaHook.sln')">
+    <MetaHookBaseDir>$(SolutionDir)..\externals\MetaHookSv\</MetaHookBaseDir>
+  </PropertyGroup>
+   
+  <PropertyGroup Condition="exists('$(SolutionDir)..\..\externals\MetaHookSv\MetaHook.sln')">
+    <MetaHookBaseDir>$(SolutionDir)..\..\externals\MetaHookSv\</MetaHookBaseDir>
+  </PropertyGroup>
+   
+  <PropertyGroup Condition="exists('$(SolutionDir)..\..\..\externals\MetaHookSv\MetaHook.sln')">
+    <MetaHookBaseDir>$(SolutionDir)..\..\..\externals\MetaHookSv\</MetaHookBaseDir>
+  </PropertyGroup>
+   
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(MetaHookBaseDir)tools\global.props" Condition="exists('$(MetaHookBaseDir)tools\global.props')" />
+    <Import Project="$(MetaHookBaseDir)tools\global_template.props" Condition="!exists('$(MetaHookBaseDir)tools\global.props') and exists('$(MetaHookBaseDir)tools\global_template.props')" />
+    <Import Project="$(MetaHookBaseDir)tools\global_common.props" />
+    <Import Project="$(MetaHookBaseDir)thirdparty\VC-LTL\VC-LTL helper for Visual Studio.props" />
+  </ImportGroup>
+
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(MetaHookBaseDir)tools\global.props" Condition="exists('$(MetaHookBaseDir)tools\global.props')" />
+    <Import Project="$(MetaHookBaseDir)tools\global_template.props" Condition="!exists('$(MetaHookBaseDir)tools\global.props') and exists('$(MetaHookBaseDir)tools\global_template.props')" />
+    <Import Project="$(MetaHookBaseDir)tools\global_common.props" />
+    <Import Project="$(MetaHookBaseDir)thirdparty\VC-LTL\VC-LTL helper for Visual Studio.props" />
+  </ImportGroup>
+
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32' and '$(ProjectName)'=='MetaAudio'">
+    <PostBuildEvent>
+      <Command>
+        if exist "$(MetaHookGameDirectory)$(MetaHookModName)\metahook\plugins" if not "$(MetaHookGameDirectory)" == "" copy "$(OutDir)$(TargetName)$(TargetExt)" "$(MetaHookGameDirectory)$(MetaHookModName)\metahook\plugins\" /y
+      </Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32' and '$(ProjectName)'=='sndfile'">
+    <PostBuildEvent>
+      <Command>
+        if exist "$(MetaHookGameDirectory)$(MetaHookModName)\metahook\dlls" if not "$(MetaHookGameDirectory)" == "" copy "$(OutDir)$(TargetName)$(TargetExt)" "$(MetaHookGameDirectory)$(MetaHookModName)\metahook\dlls\" /y
+      </Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+
+</Project>
