@@ -54,6 +54,7 @@ jobs:
         run: |
           copy "build\x86\Release\bin\MetaAudio.dll" "Build-Output\metahook\plugins"
           copy "build\x86\Release\bin\sndfile.dll" "Build-Output\metahook\dlls"
+          copy "build\x86\Release\bin\OpenAL32.dll" "Build-Output\metahook\dlls"
         shell: cmd
         
       - name: Zipping All
