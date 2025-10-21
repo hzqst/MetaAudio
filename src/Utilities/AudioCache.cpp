@@ -6,7 +6,7 @@ namespace MetaAudio
   {
     if (c->data)
     {
-      Sys_ErrorEx("Cache_Alloc: already allocated");
+      Sys_Error("Cache_Alloc: already allocated");
     }
 
     auto& result = cache.emplace(name, aud_sfxcache_t());

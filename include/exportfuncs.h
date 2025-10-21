@@ -6,5 +6,3 @@
 #include <r_studioint.h>
 #include <cl_entity.h>
 #include <sequence.h>
-
-void Sys_ErrorEx(const char *fmt, ...);

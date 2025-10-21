@@ -38,7 +38,7 @@ namespace MetaAudio
     auto result = fader->ToNewValue(
       FadeResult{ value.elapsed_time, value.initial_value, value.last_target, value.current },
       value.target,
-      static_cast<float>((*gAudEngine.cl_time) - (*gAudEngine.cl_oldtime))
+      static_cast<float>((*cl_time) - (*cl_oldtime))
       );
     value.elapsed_time = result.TotalElapsedTime;
     value.initial_value = result.Initial;
@@ -104,9 +104,9 @@ namespace MetaAudio
   {
     alure::FilterParams params{1.0f, AL_LOWPASS_DEFAULT_GAIN, AL_HIGHPASS_DEFAULT_GAIN };
 
-    cl_entity_t* pent = gEngfuncs.GetEntityByIndex(*gAudEngine.cl_viewentity);
+    cl_entity_t* pent = gEngfuncs.GetEntityByIndex((*cl_viewentity));
     cl_entity_t* sent = gEngfuncs.GetEntityByIndex(ch->entnum);
-    if (ch->entnum != *gAudEngine.cl_viewentity && pent != nullptr && sent != nullptr)
+    if (ch->entnum != (*cl_viewentity) && pent != nullptr && sent != nullptr)
     {
       // Detect collisions and reduce gain on occlusion
       if (settings.OcclusionEnabled())

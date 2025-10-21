@@ -24,17 +24,14 @@ mh_enginesave_t *g_pMetaSave = nullptr;
 IFileSystem *g_pFileSystem = nullptr;
 IFileSystem_HL25* g_pFileSystem_HL25 = nullptr;
 
-HINSTANCE g_hInstance = nullptr, g_hThisModule = nullptr, g_hEngineModule = nullptr, g_hSteamAudioInstance = nullptr;
-PVOID g_dwEngineBase = 0;
-DWORD g_dwEngineSize = 0;
-PVOID g_dwEngineTextBase = 0;
-DWORD g_dwEngineTextSize = 0;
-PVOID g_dwEngineDataBase = 0;
-DWORD g_dwEngineDataSize = 0;
-PVOID g_dwEngineRdataBase = 0;
-DWORD g_dwEngineRdataSize = 0;
+HINSTANCE g_hSteamAudioInstance = nullptr;
 DWORD g_dwEngineBuildnum = 0;
 int g_iEngineType = 0;
+
+mh_dll_info_t g_EngineDLLInfo = { 0 };
+mh_dll_info_t g_MirrorEngineDLLInfo = { 0 };
+mh_dll_info_t g_ClientDLLInfo = { 0 };
+mh_dll_info_t g_MirrorClientDLLInfo = { 0 };
 
 ICommandLine *CommandLine()
 {
@@ -46,7 +43,6 @@ void IPluginsV4::Init(metahook_api_t *pAPI, mh_interface_t *pInterface, mh_engin
   g_pInterface = pInterface;
   g_pMetaHookAPI = pAPI;
   g_pMetaSave = pSave;
-  g_hInstance = GetModuleHandle(NULL);
 
   g_hSteamAudioInstance = LoadLibrary("phonon.dll");
   if (g_hSteamAudioInstance)
@@ -87,16 +83,26 @@ void IPluginsV4::LoadEngine(cl_enginefunc_t* pEngfuncs)
 
   g_iEngineType = g_pMetaHookAPI->GetEngineType();
   g_dwEngineBuildnum = g_pMetaHookAPI->GetEngineBuildnum();
-  g_hEngineModule = g_pMetaHookAPI->GetEngineModule();
-  g_dwEngineBase = g_pMetaHookAPI->GetEngineBase();
-  g_dwEngineSize = g_pMetaHookAPI->GetEngineSize();
-  g_dwEngineTextBase = g_pMetaHookAPI->GetSectionByName(g_dwEngineBase, ".text\x0\x0\x0", &g_dwEngineTextSize);
-  g_dwEngineDataBase = g_pMetaHookAPI->GetSectionByName(g_dwEngineBase, ".data\x0\x0\x0", &g_dwEngineDataSize);
-  g_dwEngineRdataBase = g_pMetaHookAPI->GetSectionByName(g_dwEngineBase, ".rdata\x0\x0", &g_dwEngineRdataSize);
+
+  g_EngineDLLInfo.ImageBase = g_pMetaHookAPI->GetEngineBase();
+  g_EngineDLLInfo.ImageSize = g_pMetaHookAPI->GetEngineSize();
+  g_EngineDLLInfo.TextBase = g_pMetaHookAPI->GetSectionByName(g_EngineDLLInfo.ImageBase, ".text\x0\x0\x0", &g_EngineDLLInfo.TextSize);
+  g_EngineDLLInfo.DataBase = g_pMetaHookAPI->GetSectionByName(g_EngineDLLInfo.ImageBase, ".data\x0\x0\x0", &g_EngineDLLInfo.DataSize);
+  g_EngineDLLInfo.RdataBase = g_pMetaHookAPI->GetSectionByName(g_EngineDLLInfo.ImageBase, ".rdata\x0\x0", &g_EngineDLLInfo.RdataSize);
+
+  g_MirrorEngineDLLInfo.ImageBase = g_pMetaHookAPI->GetMirrorEngineBase();
+  g_MirrorEngineDLLInfo.ImageSize = g_pMetaHookAPI->GetMirrorEngineSize();
+
+  if (g_MirrorEngineDLLInfo.ImageBase)
+  {
+      g_MirrorEngineDLLInfo.TextBase = g_pMetaHookAPI->GetSectionByName(g_MirrorEngineDLLInfo.ImageBase, ".text\x0\x0\x0", &g_MirrorEngineDLLInfo.TextSize);
+      g_MirrorEngineDLLInfo.DataBase = g_pMetaHookAPI->GetSectionByName(g_MirrorEngineDLLInfo.ImageBase, ".data\x0\x0\x0", &g_MirrorEngineDLLInfo.DataSize);
+      g_MirrorEngineDLLInfo.RdataBase = g_pMetaHookAPI->GetSectionByName(g_MirrorEngineDLLInfo.ImageBase, ".rdata\x0\x0", &g_MirrorEngineDLLInfo.RdataSize);
+  }
 
   memcpy(&gEngfuncs, pEngfuncs, sizeof(gEngfuncs));
 
-  S_FillAddress();
+  Engine_FillAddress(g_MirrorEngineDLLInfo.ImageBase ? g_MirrorEngineDLLInfo : g_EngineDLLInfo, g_EngineDLLInfo);
   S_InstallHook(audio_engine.get(), sound_loader.get());
 }
 

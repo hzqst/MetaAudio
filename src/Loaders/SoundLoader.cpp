@@ -12,16 +12,18 @@ namespace MetaAudio
   std::optional<alure::String> SoundLoader::S_GetFilePath(const alure::String& sfx_name, bool is_stream)
   {
     alure::String new_name(sfx_name);
-    alure::String m_function_name;
+    const char * _function_name = "";
+
     if (is_stream)
     {
-      m_function_name = "S_LoadStreamSound";
+        _function_name = "S_LoadStreamSound";
       new_name.erase(new_name.begin());
     }
     else
     {
-      m_function_name = "S_LoadSound";
+        _function_name = "S_LoadSound";
     }
+
     bool valid_file = false;
 
     int char_index = new_name.rfind('.', new_name.length());
@@ -40,14 +42,14 @@ namespace MetaAudio
         }
         catch (const std::runtime_error& error)
         {
-          gEngfuncs.Con_DPrintf("%s: Couldn't load %s. %s.\n", m_function_name.c_str(), new_name.c_str(), error.what());
+          gEngfuncs.Con_DPrintf("%s: Couldn't load %s. %s.\n", _function_name, new_name.c_str(), error.what());
           valid_file = false;
         }
       }
     }
     else
     {
-      gEngfuncs.Con_DPrintf("%s: Couldn't load %s. Invalid file name.\n", m_function_name.c_str(), sfx_name.c_str());
+      gEngfuncs.Con_DPrintf("%s: Couldn't load %s. Invalid file name.\n", _function_name, sfx_name.c_str());
       return std::optional<alure::String>{};
     }
 
@@ -57,7 +59,7 @@ namespace MetaAudio
     }
     else
     {
-      gEngfuncs.Con_DPrintf("%s: Couldn't load %s.\n", m_function_name.c_str(), sfx_name.c_str());
+      gEngfuncs.Con_DPrintf("%s: Couldn't load %s.\n", _function_name, sfx_name.c_str());
       return std::nullopt;
     }
   }
@@ -229,8 +231,7 @@ namespace MetaAudio
     }
     catch (const std::exception& e)
     {
-      MessageBox(NULL, e.what(), "Error on S_LoadSound", MB_ICONERROR);
-      exit(0);
+      Sys_Error("S_LoadSound Error: %s", e.what());
     }
   }
 }

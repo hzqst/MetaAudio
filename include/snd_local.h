@@ -4,6 +4,7 @@
 
 #include "exportfuncs.h"
 #include "enginedef.h"
+#include "plugins.h"
 #include "aud_int_internal.h"
 
 //internal structures
@@ -83,20 +84,6 @@ struct aud_sfxcache_t
 
 struct aud_engine_t
 {
-  int *cl_servercount;
-  int *cl_parsecount;
-  int *cl_viewentity;
-  int *cl_num_entities;
-  int *cl_waterlevel;
-
-  double *cl_time;
-  double *cl_oldtime;
-
-  float *g_SND_VoiceOverdrive;
-
-  char *(*rgpszrawsentence)[CVOXFILESENTENCEMAX];
-  int *cszrawsentences;
-
   //s_dma.c
   int(*SNDDMA_Init)(void);//hooked
   void(*S_Startup)(void);//deprecated, use SNDDMA_Init instead
@@ -125,18 +112,34 @@ struct aud_engine_t
   //sequence.c
   sentenceEntry_s*(*SequenceGetSentenceByIndex)(unsigned int index);
 
-  //sys_dll.c
-#ifdef _DEBUG
-  void(*Sys_Error)(char *fmt, ...);
-#endif
+  //gl_rmain.c
+  void(*R_DrawTEntitiesOnList)(int onlyClientDraw);
 };
 
 //snd_hook.cpp
-void S_FillAddress(void);
+void Engine_FillAddress(const mh_dll_info_t& DllInfo, const mh_dll_info_t& RealDllInfo);
 
 void S_InstallHook(MetaAudio::AudioEngine* engine, MetaAudio::SoundLoader* loader);
 
 void S_UninstallHook();
 
+PVOID ConvertDllInfoSpace(PVOID addr, const mh_dll_info_t& SrcDllInfo, const mh_dll_info_t& TargetDllInfo);
+
 //common
 extern aud_engine_t gAudEngine;
+
+extern int* cl_servercount;
+extern int* cl_parsecount;
+extern void* cl_frames;
+extern int size_of_frame;
+extern int* cl_viewentity;
+extern int* cl_num_entities;
+extern int* cl_waterlevel;
+
+extern double* cl_time;
+extern double* cl_oldtime;
+
+extern float* g_SND_VoiceOverdrive;
+
+extern char* (*rgpszrawsentence)[CVOXFILESENTENCEMAX];
+extern int* cszrawsentences;

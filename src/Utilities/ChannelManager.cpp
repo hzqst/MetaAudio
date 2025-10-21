@@ -72,7 +72,7 @@ namespace MetaAudio
           return false;
         }
 
-        if (channel.sfx && channel.entnum == *gAudEngine.cl_viewentity && entnum != *gAudEngine.cl_viewentity)
+        if (channel.sfx && channel.entnum == (*cl_viewentity) && entnum != (*cl_viewentity))
         {
           return false;
         }

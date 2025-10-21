@@ -241,14 +241,14 @@ namespace MetaAudio
         return alure::String(sentenceEntry->data);
     }
 
-    for (size_t i = 0, final = *gAudEngine.cszrawsentences; i < final; ++i)
+    for (size_t i = 0, final = (*cszrawsentences); i < final; ++i)
     {
-      if (!_stricmp(pszin.c_str(), (*gAudEngine.rgpszrawsentence)[i]))
+      if (!_stricmp(pszin.c_str(), (*rgpszrawsentence)[i]))
       {
         if (psentencenum)
           *psentencenum = i;
 
-        cptr = &(*gAudEngine.rgpszrawsentence)[i][strlen((*gAudEngine.rgpszrawsentence)[i]) + 1];
+        cptr = &(*rgpszrawsentence)[i][strlen((*rgpszrawsentence)[i]) + 1];
         while (*cptr == ' ' || *cptr == '\t')
           cptr++;
 

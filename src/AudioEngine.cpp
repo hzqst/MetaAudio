@@ -54,10 +54,10 @@ namespace MetaAudio
       sfx_t* sfx = nullptr;
 
       if (!name)
-        Sys_ErrorEx("S_FindName: NULL\n");
+        Sys_Error("S_FindName: NULL\n");
 
       if (strlen(name) >= MAX_QPATH)
-        Sys_ErrorEx("Sound name too long: %s", name);
+        Sys_Error("Sound name too long: %s", name);
 
       auto sfx_iterator = known_sfx.find(name);
       if (sfx_iterator != known_sfx.end())
@@ -68,7 +68,7 @@ namespace MetaAudio
         }
 
         if (sfx_iterator->second.servercount > 0)
-          sfx_iterator->second.servercount = *gAudEngine.cl_servercount;
+          sfx_iterator->second.servercount = (*cl_servercount);
 
         return &(sfx_iterator->second);
       }
@@ -76,7 +76,7 @@ namespace MetaAudio
       {
         for (auto& sfxElement : known_sfx)
         {
-          if (sfxElement.second.servercount > 0 && sfxElement.second.servercount != *gAudEngine.cl_servercount)
+          if (sfxElement.second.servercount > 0 && sfxElement.second.servercount != (*cl_servercount))
           {
             S_FreeCache(&(sfxElement.second));
             known_sfx.erase(sfxElement.first);
@@ -102,13 +102,12 @@ namespace MetaAudio
       if (pfInCache)
         *pfInCache = 0;
 
-      sfx->servercount = *gAudEngine.cl_servercount;
+      sfx->servercount = (*cl_servercount);
       return sfx;
     }
     catch (const std::exception& e)
     {
-      MessageBox(NULL, e.what(), "Error on S_FindName", MB_ICONERROR);
-      exit(0);
+      Sys_Error("S_FindName Error: %s", e.what());
     }
   }
 
@@ -196,7 +195,7 @@ namespace MetaAudio
       return;
 
     //apply effect
-    qboolean underwater = (*gAudEngine.cl_waterlevel > 2) ? true : false;
+    qboolean underwater = (*cl_waterlevel) > 2 ? true : false;
     al_efx->ApplyEffect(ch, underwater);
 
     //for later usage
@@ -213,14 +212,14 @@ namespace MetaAudio
 
     //update position
     alure::Vector3 alure_position(0, 0, 0);
-    if (ch->entnum != *gAudEngine.cl_viewentity)
+    if (ch->entnum != (*cl_viewentity))
     {
       ch->sound_source->SetRelative(false);
-      if (ch->entnum > 0 && ch->entnum < *gAudEngine.cl_num_entities)
+      if (ch->entnum > 0 && ch->entnum < (*cl_num_entities))
       {
         auto sent = gEngfuncs.GetEntityByIndex(ch->entnum);
 
-        if (sent && sent->model && sent->curstate.messagenum == *gAudEngine.cl_parsecount)
+        if (sent && sent->model && sent->curstate.messagenum == (*cl_parsecount))
         {
           VectorCopy(sent->origin, ch->origin);
 
@@ -237,9 +236,9 @@ namespace MetaAudio
           }
 
           float ratio = 0;
-          if ((*gAudEngine.cl_time) != (*gAudEngine.cl_oldtime))
+          if ((*cl_time) != (*cl_oldtime))
           {
-            ratio = static_cast<float>(1 / ((*gAudEngine.cl_time) - (*gAudEngine.cl_oldtime)));
+            ratio = static_cast<float>(1 / ((*cl_time) - (*cl_oldtime)));
           }
 
           vec3_t sent_velocity = { (sent->curstate.origin[0] - sent->prevstate.origin[0]) * ratio,
@@ -273,7 +272,7 @@ namespace MetaAudio
 
     if (sc && sc->length != 0x40000000)
     {
-      fvol /= (*gAudEngine.g_SND_VoiceOverdrive);
+      fvol /= (*g_SND_VoiceOverdrive);
     }
 
     ch->sound_source->SetGain(ch->volume * fvol);
@@ -339,13 +338,13 @@ namespace MetaAudio
 
       al_efx->SetListenerOrientation(alure_orientation);
 
-      cl_entity_t* pent = gEngfuncs.GetEntityByIndex(*gAudEngine.cl_viewentity);
+      cl_entity_t* pent = gEngfuncs.GetEntityByIndex(*cl_viewentity);
       if (pent != nullptr)
       {
         float ratio = 0;
-        if ((*gAudEngine.cl_time) != (*gAudEngine.cl_oldtime))
+        if ((*cl_time) != (*cl_oldtime))
         {
-          ratio = static_cast<float>(1 / ((*gAudEngine.cl_time) - (*gAudEngine.cl_oldtime)));
+          ratio = static_cast<float>(1 / ((*cl_time) - (*cl_oldtime)));
         }
 
         vec3_t view_velocity = { (pent->curstate.origin[0] - pent->prevstate.origin[0]) * ratio,
@@ -357,7 +356,7 @@ namespace MetaAudio
       al_listener.setPosition(AL_UnpackVector(origin));
       al_listener.setOrientation(alure_orientation);
 
-      bool underwater = (*gAudEngine.cl_waterlevel > 2) ? true : false;
+      bool underwater = (*cl_waterlevel > 2) ? true : false;
       int roomtype = underwater ?
           (int)settings.ReverbUnderwaterType() :
           (int)settings.ReverbType();
@@ -387,8 +386,7 @@ namespace MetaAudio
     }
     catch (const std::exception& e)
     {
-      MessageBox(NULL, e.what(), "Error on S_Update", MB_ICONERROR);
-      exit(0);
+      Sys_Error("S_Update Error: %s", e.what());
     }
   }
 
@@ -411,7 +409,8 @@ namespace MetaAudio
 
   void AudioEngine::S_StartSound(int entnum, int entchannel, sfx_t* sfx, float* origin, float fvol, float attenuation, int flags, int pitch, bool is_static)
   {
-    std::string _function_name;
+    const char * _function_name = "";
+
     if (is_static)
     {
       _function_name = "S_StartStaticSound";
@@ -558,8 +557,7 @@ namespace MetaAudio
     }
     catch (const std::exception& e)
     {
-      MessageBox(NULL, e.what(), "Error on S_StartDynamicSound", MB_ICONERROR);
-      exit(0);
+        Sys_Error("S_StartDynamicSound Error: %s", e.what());
     }
   }
 
@@ -571,8 +569,7 @@ namespace MetaAudio
     }
     catch (const std::exception& e)
     {
-      MessageBox(NULL, e.what(), "Error on S_StartStaticSound", MB_ICONERROR);
-      exit(0);
+        Sys_Error("S_StartStaticSound Error: %s", e.what());
     }
   }
 
@@ -584,8 +581,7 @@ namespace MetaAudio
     }
     catch (const std::exception& e)
     {
-      MessageBox(NULL, e.what(), "Error on S_StopSound", MB_ICONERROR);
-      exit(0);
+        Sys_Error("S_StopSound Error: %s", e.what());
     }
   }
 
@@ -600,8 +596,7 @@ namespace MetaAudio
     }
     catch (const std::exception& e)
     {
-      MessageBox(NULL, e.what(), "Error on S_StopAllSounds", MB_ICONERROR);
-      exit(0);
+        Sys_Error("S_StopAllSounds Error: %s", e.what());
     }
   }
 
