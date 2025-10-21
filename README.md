@@ -77,9 +77,7 @@ Example folder structure, where <game> can be "valve", "cstrike", "ns", "gearbox
 
 3. Add a new entry `MetaAudio.dll` in the `plugins.lst`.
 
-* One should load the game through "MetaHook.exe". It is recommended to create a shortcut with at least the following launch options:
-
-"-steam -insecure -game <game>".
+* One should load the game through "MetaHook.exe". It is recommended to create a shortcut with at least the following launch options：`-steam -insecure -game <game>`.
 
 # Known bugs
 
