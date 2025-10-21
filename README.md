@@ -98,15 +98,13 @@ Example folder structure, where <game> can be "valve", "cstrike", "ns", "gearbox
 
 # Compiling
 
-1. `git clone --recursive <repoUrl>`, while `<repoUrl>` should be the MetaAudio repository URL.
+1. `git clone --recursive <repoUrl>`, where `<repoUrl>` should be the MetaAudio repository URL.
 
 2. Run `scripts\build-MetaAudio-x86-Release.bat`
 
-The include Alure2 has a slight different API than upstream, therefore must be compiled together.
-
 # Debugging
 
-1. `git clone --recursive <repoUrl>`, while `<repoUrl>` should be the MetaAudio repository URL.
+1. `git clone --recursive <repoUrl>`, where `<repoUrl>` should be the MetaAudio repository URL.
 
 2. Run `externals\MetaHookSv\scripts\debug-(WhateverGameYouWant).bat`, depends on which game you are going to debug with.
 
