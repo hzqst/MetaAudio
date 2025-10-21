@@ -8,3 +8,6 @@
 [submodule "externals/MetaHookSv"]
 	path = externals/MetaHookSv
 	url = https://github.com/hzqst/MetaHookSv
+[submodule "externals/libsndfile-fork"]
+	path = externals/libsndfile-fork
+	url = https://github.com/hzqst/libsndfile-fork

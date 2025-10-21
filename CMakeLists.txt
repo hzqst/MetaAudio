@@ -4,12 +4,6 @@ project(MetaAudio)
 
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
-set(OPENAL_LIBRARY ${PROJECT_SOURCE_DIR}/externals/OpenAL-SDK/libs/Win32/OpenAL32.lib)
-set(OPENAL_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/externals/OpenAL-SDK/include)
-
-set(SNDFILE_LIBRARY ${PROJECT_SOURCE_DIR}/externals/libsndfile/lib/sndfile.lib)
-set(SNDFILE_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/externals/libsndfile/include)
-
 # Configure Alure2 the way we need it
 option(METAAUDIO_STATIC_ALURE "Link Alure2 statically" ON)
 if(METAAUDIO_STATIC_ALURE)
@@ -26,7 +20,12 @@ option(ALURE_ENABLE_VORBIS "" OFF)
 option(ALURE_ENABLE_FLAC "" OFF)
 option(ALURE_INSTALL "" OFF)
 option(ALURE_BUILD_EXAMPLES "" OFF)
-# MetaAudio requires libSndFile
+
+# cleanup libSndFile testing configuration
+option(BUILD_EXAMPLES "" OFF)
+option(BUILD_PROGRAMS "" OFF)
+option(BUILD_TESTING "" OFF)
+option(INSTALL_MANPAGES "" OFF)
 
 set(SOURCES
     src/exportfuncs.cpp
@@ -72,17 +71,34 @@ target_include_directories(MetaAudio
         ${PROJECT_SOURCE_DIR}/externals/picojson
         ${PROJECT_SOURCE_DIR}/externals/steamaudio/include
         ${PROJECT_SOURCE_DIR}/externals/alure/include/AL
-        ${PROJECT_SOURCE_DIR}/externals/MetaHookSv
-        ${PROJECT_SOURCE_DIR}/externals/MetaHookSv/Interface
-        ${PROJECT_SOURCE_DIR}/externals/MetaHookSv/HLSDK/common
-        ${PROJECT_SOURCE_DIR}/externals/MetaHookSv/HLSDK/cl_dll
-        ${PROJECT_SOURCE_DIR}/externals/MetaHookSv/HLSDK/engine
-        ${PROJECT_SOURCE_DIR}/externals/MetaHookSv/HLSDK/public
-        ${PROJECT_SOURCE_DIR}/externals/MetaHookSv/HLSDK/pm_shared
-        ${PROJECT_SOURCE_DIR}/externals/MetaHookSv/capstone/include/capstone
+        ${PROJECT_SOURCE_DIR}/externals/MetaHookSv/include
+        ${PROJECT_SOURCE_DIR}/externals/MetaHookSv/include/Interface
+        ${PROJECT_SOURCE_DIR}/externals/MetaHookSv/include/HLSDK/common
+        ${PROJECT_SOURCE_DIR}/externals/MetaHookSv/include/HLSDK/cl_dll
+        ${PROJECT_SOURCE_DIR}/externals/MetaHookSv/include/HLSDK/engine
+        ${PROJECT_SOURCE_DIR}/externals/MetaHookSv/include/HLSDK/public
+        ${PROJECT_SOURCE_DIR}/externals/MetaHookSv/include/HLSDK/pm_shared
+        ${PROJECT_SOURCE_DIR}/externals/MetaHookSv/thirdparty/capstone_fork/include/capstone
 )
 
+# Alure requires OpenAL
+set(OPENAL_LIBRARY ${PROJECT_SOURCE_DIR}/externals/OpenAL-SDK/libs/Win32/OpenAL32.lib)
+set(OPENAL_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/externals/OpenAL-SDK/include)
+
 find_package(OpenAL REQUIRED)
+
+# Alure requires libSndFile
+add_subdirectory(externals/libsndfile-fork)
+
+# Set SndFile variables for Alure's find_package to succeed
+# libsndfile-fork creates a target 'sndfile' that we can reference
+set(SNDFILE_LIBRARY sndfile)
+set(SNDFILE_LIBRARIES sndfile)
+set(SNDFILE_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/externals/libsndfile-fork/include)
+set(SNDFILE_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/externals/libsndfile-fork/include)
+set(SNDFILE_FOUND TRUE)
+
+# MetaAudio requires Alure
 add_subdirectory(externals/alure)
 
 if ((MSVC) AND (MSVC_VERSION GREATER_EQUAL 1914))
@@ -92,6 +108,15 @@ if ((MSVC) AND (MSVC_VERSION GREATER_EQUAL 1914))
     target_compile_options(MetaAudio PUBLIC "/Zc:__cplusplus")
 endif()
 
+# Ensure proper build order dependencies
+add_dependencies(${ALURE2_LIBRARY} sndfile)
 add_dependencies(MetaAudio ${ALURE2_LIBRARY})
 
-target_link_libraries(MetaAudio PRIVATE ${OPENAL_LIBRARY} ${ALURE2_LIBRARY})
+target_link_libraries(MetaAudio PRIVATE ${OPENAL_LIBRARY} ${ALURE2_LIBRARY} sndfile)
+
+# Install MetaAudio.dll to bin directory
+install(TARGETS MetaAudio
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+)
