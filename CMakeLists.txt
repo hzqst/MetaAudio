@@ -27,6 +27,7 @@ option(BUILD_PROGRAMS "" OFF)
 option(BUILD_TESTING "" OFF)
 option(INSTALL_MANPAGES "" OFF)
 
+# Collect all source files
 set(SOURCES
     src/exportfuncs.cpp
     src/metaaudio.cpp
@@ -58,7 +59,13 @@ set(SOURCES
     src/SoundSources/StreamingSoundSource.cpp
 )
 
-add_library(MetaAudio SHARED ${SOURCES})
+# Collect all header files from include directory
+file(GLOB_RECURSE HEADERS 
+    "${PROJECT_SOURCE_DIR}/include/*.h"
+    "${PROJECT_SOURCE_DIR}/include/*.hpp"
+)
+
+add_library(MetaAudio SHARED ${SOURCES} ${HEADERS})
 
 set_property(TARGET MetaAudio PROPERTY CXX_STANDARD 17)
 
