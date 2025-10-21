@@ -38,7 +38,6 @@ set(SOURCES
     src/Vox/VoxManager.cpp
     src/Loaders/LocalAudioDecoder.cpp
     src/Utilities/AudioCache.cpp
-    src/interface.cpp
     src/Config/EfxJsonReader.cpp
     src/Config/SettingsManager.cpp
     src/Effects/GoldSrcOcclusionCalculator.cpp
@@ -57,6 +56,8 @@ set(SOURCES
     src/SoundSources/BaseSoundSource.cpp
     src/SoundSources/StaticSoundSource.cpp
     src/SoundSources/StreamingSoundSource.cpp
+    # Use interface.cpp from HLSDK
+    ${PROJECT_SOURCE_DIR}/externals/MetaHookSv/include/HLSDK/common/interface.cpp
 )
 
 # Collect all header files from include directory
