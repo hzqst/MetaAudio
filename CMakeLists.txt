@@ -96,7 +96,11 @@ set(OPENAL_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/externals/OpenAL-SDK/include)
 find_package(OpenAL REQUIRED)
 
 # Alure requires libSndFile
+# Configure libsndfile to build as shared library
+set(BUILD_SHARED_LIBS ON)
 add_subdirectory(externals/libsndfile-fork)
+# Reset BUILD_SHARED_LIBS to avoid affecting other dependencies
+set(BUILD_SHARED_LIBS OFF)
 
 # Set SndFile variables for Alure's find_package to succeed
 # libsndfile-fork creates a target 'sndfile' that we can reference
@@ -122,8 +126,8 @@ add_dependencies(MetaAudio ${ALURE2_LIBRARY})
 
 target_link_libraries(MetaAudio PRIVATE ${OPENAL_LIBRARY} ${ALURE2_LIBRARY} sndfile)
 
-# Install MetaAudio.dll to bin directory
-install(TARGETS MetaAudio
+# Install MetaAudio.dll and libsndfile.dll to bin directory
+install(TARGETS MetaAudio sndfile
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
