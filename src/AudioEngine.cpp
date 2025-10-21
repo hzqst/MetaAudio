@@ -609,7 +609,7 @@ namespace MetaAudio
 
       al_dev_manager = alure::DeviceManager::getInstance();
 
-      const char* _al_set_device;
+      const char* _al_set_device = nullptr;
       const char* device_set = CommandLine()->CheckParm("-al_device", &_al_set_device);
 
       if (_al_set_device != nullptr)
@@ -635,15 +635,19 @@ namespace MetaAudio
     }
     catch (const std::exception& e)
     {
-      const size_t size = 4096;
+       const auto& availableDevices = al_dev_manager.enumerate(alure::DeviceEnumeration::Basic);
 
       std::stringstream ss;
 
-      ss << "Unable to load. Reason:\n";
+      ss << "Unable to load OpenAL device:\n";
       ss << e.what();
+      ss << "\nAvailable devices: \n";
+      for (const auto& dev : availableDevices)
+      {
+          ss << "\"" << dev.c_str() << "\"\n";
+      }
 
-      auto msg = ss.str();
-      MessageBox(NULL, msg.c_str(), "OpenAL Error", MB_ICONERROR);
+      Sys_Error("%s", ss.str());
 
       return false;
     }

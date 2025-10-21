@@ -6,6 +6,8 @@
 #include "Loaders/SoundLoader.hpp"
 
 #include <capstone.h>
+#include <unordered_map>
+#include <utility>
 
 aud_engine_t gAudEngine = {0};
 
@@ -133,7 +135,7 @@ void Engine_FillAddress_S_Init(const mh_dll_info_t& DllInfo, const mh_dll_info_t
             auto Sound_Init_PushString = (PUCHAR)Search_Pattern(pattern, DllInfo);
             if (Sound_Init_PushString)
             {
-                S_Init_VA = Sound_Init_PushString;
+                S_Init_VA = g_pMetaHookAPI->ReverseSearchFunctionBegin(Sound_Init_PushString, 0x30);
             }
         }
     }
@@ -151,6 +153,8 @@ void Engine_FillAddress_S_Init(const mh_dll_info_t& DllInfo, const mh_dll_info_t
         else if (g_iEngineType == ENGINE_GOLDSRC)
         {
             S_Init_VA = Search_Pattern(S_INIT_SIG_NEW, DllInfo);
+            if (!S_Init_VA)
+               S_Init_VA = Search_Pattern(S_INIT_SIG_BLOB, DllInfo);
         }
         else if (g_iEngineType == ENGINE_GOLDSRC_BLOB)
         {
@@ -159,9 +163,9 @@ void Engine_FillAddress_S_Init(const mh_dll_info_t& DllInfo, const mh_dll_info_t
     }
 
     gAudEngine.S_Init = (decltype(gAudEngine.S_Init))ConvertDllInfoSpace(S_Init_VA, DllInfo, RealDllInfo);
+
     Sig_FuncNotFound(S_Init);
 }
-
 
 void Engine_FillAddress_S_Startup(const mh_dll_info_t& DllInfo, const mh_dll_info_t& RealDllInfo)
 {
@@ -654,7 +658,7 @@ void Engine_FillAddress_SND_Spatialize(const mh_dll_info_t& DllInfo, const mh_dl
 
     if (1)
     {
-        char pattern[] = "\x85\xC0\x0F\x2A\x2A\x2A\x2A\x2A\x3B\x05\x2A\x2A\x2A\x2A\x0F\x2A\x2A\x2A\x2A\x2A";
+        char pattern[] = "\x0F\x2A\x2A\x2A\x2A\x2A\x3B\x05\x2A\x2A\x2A\x2A\x0F\x2A\x2A\x2A\x2A\x2A";
 
         /*
 .text:01D980C0                                     loc_1D980C0:                            ; CODE XREF: SND_Spatialize+1C↑j
@@ -667,7 +671,7 @@ void Engine_FillAddress_SND_Spatialize(const mh_dll_info_t& DllInfo, const mh_dl
         auto cl_num_entities_pattern = (PUCHAR)Search_Pattern_From_Size(SND_Spatialize_VA, 0x80, pattern);
         if (cl_num_entities_pattern)
         {
-            cl_num_entities = (decltype(cl_num_entities))ConvertDllInfoSpace((*(PVOID*)(cl_num_entities_pattern + 10)), DllInfo, RealDllInfo);
+            cl_num_entities = (decltype(cl_num_entities))ConvertDllInfoSpace((*(PVOID*)(cl_num_entities_pattern + 8)), DllInfo, RealDllInfo);
         }
     }
     
@@ -895,7 +899,7 @@ void Engine_FillAddress_S_StopAllSounds(const mh_dll_info_t& DllInfo, const mh_d
         */
         char pattern[] = "\x68\x2A\x2A\x2A\x2A\xE8\x2A\x2A\x2A\x2A\x68\x2A\x2A\x2A\x2A\x68\x2A\x2A\x2A\x2A";
         *(DWORD*)(pattern + 1) = (DWORD)spk_String;
-        auto spk_PushString = (PUCHAR)Search_Pattern_Data(pattern, DllInfo);
+        auto spk_PushString = (PUCHAR)Search_Pattern(pattern, DllInfo);
         if (spk_PushString)
         {
             auto S_StopAllSoundsC_VA = (PUCHAR) *(ULONG_PTR*)(spk_PushString + 11);
@@ -921,6 +925,8 @@ void Engine_FillAddress_S_StopAllSounds(const mh_dll_info_t& DllInfo, const mh_d
         else if (g_iEngineType == ENGINE_GOLDSRC)
         {
             S_StopAllSounds_VA = Search_Pattern(S_SOUNDALLSOUNDS_SIG_NEW, DllInfo);
+            if(!S_StopAllSounds_VA)
+                S_StopAllSounds_VA = Search_Pattern(S_SOUNDALLSOUNDS_SIG_BLOB, DllInfo);
         }
         else if (g_iEngineType == ENGINE_GOLDSRC_BLOB)
         {
@@ -997,6 +1003,8 @@ void Engine_FillAddress_S_Update(const mh_dll_info_t& DllInfo, const mh_dll_info
         else if (g_iEngineType == ENGINE_GOLDSRC)
         {
             S_Update_VA = Search_Pattern(S_UPDATE_SIG_NEW, DllInfo);
+            if(!S_Update_VA)
+                S_Update_VA = Search_Pattern(S_UPDATE_SIG_BLOB, DllInfo);
         }
         else if (g_iEngineType == ENGINE_GOLDSRC_BLOB)
         {
@@ -1047,6 +1055,8 @@ void Engine_FillAddress_SequenceGetSentenceByIndex(const mh_dll_info_t& DllInfo,
         else if (g_iEngineType == ENGINE_GOLDSRC)
         {
             SequenceGetSentenceByIndex_VA = Search_Pattern(SEQUENCE_GETSENTENCEBYINDEX_SIG_NEW, DllInfo);
+            if (!SequenceGetSentenceByIndex_VA)
+                SequenceGetSentenceByIndex_VA = Search_Pattern(SEQUENCE_GETSENTENCEBYINDEX_SIG_BLOB, DllInfo);
         }
         else if (g_iEngineType == ENGINE_GOLDSRC_BLOB)
         {
@@ -1728,17 +1738,16 @@ void Engine_FillAddress_SX_RoomFX(const mh_dll_info_t& DllInfo, const mh_dll_inf
         const mh_dll_info_t& DllInfo;
         const mh_dll_info_t& RealDllInfo;
 
-        PVOID cl_waterlevel_candidateVA;
-        int cl_waterlevel_reg;
-        int cl_waterlevel_instCount;
+        std::unordered_map<int, std::pair<int, PVOID>> cl_waterlevel_candidate;
     }SX_RoomFX_SearchContext;
 
-    SX_RoomFX_SearchContext ctx = { DllInfo, RealDllInfo, nullptr, 0 ,0 };
+    SX_RoomFX_SearchContext ctx = { DllInfo, RealDllInfo };
 
     g_pMetaHookAPI->DisasmRanges(SX_RoomFX_VA, 0x120, [](void* inst, PUCHAR address, size_t instLen, int instCount, int depth, PVOID context)
         {
             auto pinst = (cs_insn*)inst;
             auto ctx = (SX_RoomFX_SearchContext*)context;
+
             if (!cl_waterlevel &&
                 pinst->id == X86_INS_CMP && pinst->detail->x86.op_count == 2 &&
                 pinst->detail->x86.operands[0].type == X86_OP_MEM &&
@@ -1757,21 +1766,23 @@ void Engine_FillAddress_SX_RoomFX(const mh_dll_info_t& DllInfo, const mh_dll_inf
                 (PUCHAR)pinst->detail->x86.operands[1].mem.disp > (PUCHAR)ctx->DllInfo.DataBase &&
                 (PUCHAR)pinst->detail->x86.operands[1].mem.disp < (PUCHAR)ctx->DllInfo.DataBase + ctx->DllInfo.DataSize)
             {
-                ctx->cl_waterlevel_candidateVA = (PVOID)pinst->detail->x86.operands[1].mem.disp;
-                ctx->cl_waterlevel_instCount = instCount;
-                ctx->cl_waterlevel_reg = pinst->detail->x86.operands[0].reg;
+                ctx->cl_waterlevel_candidate[pinst->detail->x86.operands[0].reg] = std::make_pair(instCount, (PVOID)pinst->detail->x86.operands[1].mem.disp);
             }
 
             if (!cl_waterlevel &&
-               instCount > ctx->cl_waterlevel_instCount &&
-                instCount < ctx->cl_waterlevel_instCount + 3 &&
+                !ctx->cl_waterlevel_candidate.empty() &&
                 pinst->id == X86_INS_CMP && pinst->detail->x86.op_count == 2 &&
                 pinst->detail->x86.operands[0].type == X86_OP_REG &&
-                pinst->detail->x86.operands[0].reg == ctx->cl_waterlevel_reg &&
                 pinst->detail->x86.operands[1].type == X86_OP_IMM &&
                 pinst->detail->x86.operands[1].imm == 2)
             {
-                cl_waterlevel = (decltype(cl_waterlevel))ConvertDllInfoSpace(ctx->cl_waterlevel_candidateVA,ctx->DllInfo, ctx->RealDllInfo);
+                auto it = ctx->cl_waterlevel_candidate.find(pinst->detail->x86.operands[0].reg);
+                if (it != ctx->cl_waterlevel_candidate.end() &&
+                    instCount > it->second.first &&
+                    instCount < it->second.first + 3)
+                {
+                    cl_waterlevel = (decltype(cl_waterlevel))ConvertDllInfoSpace(it->second.second, ctx->DllInfo, ctx->RealDllInfo);
+                }
             }
 
             if (cl_waterlevel)
@@ -1787,7 +1798,7 @@ void Engine_FillAddress_SX_RoomFX(const mh_dll_info_t& DllInfo, const mh_dll_inf
         }, 0, &ctx);
 
 
-    Sig_VarNotFound(cl_servercount);
+    Sig_VarNotFound(cl_waterlevel);
 }
 
 void Engine_FillAddress_GetClientTime(const mh_dll_info_t& DllInfo, const mh_dll_info_t& RealDllInfo)
