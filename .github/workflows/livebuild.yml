@@ -57,14 +57,8 @@ jobs:
           copy "install\x86\Release\bin\OpenAL32.dll" "Build-Output\metahook\dlls"
         shell: cmd
         
-      - name: Zipping All
-        uses: vimtor/action-zip@v1
-        with:
-            files: Build-Output/
-            dest: MetaAudio-windows-x86.zip
-
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v4
         with:
           name: MetaAudio-windows-x86.zip
-          path: MetaAudio-windows-x86.zip
+          path: Build-Output
