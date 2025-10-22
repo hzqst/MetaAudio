@@ -115,27 +115,29 @@ option(ALSOFT_INSTALL_AMBDEC_PRESETS "Install AmbDec preset files" OFF)
 option(ALSOFT_INSTALL_EXAMPLES "Install example programs" OFF)
 
 # Add OpenAL-Soft as subdirectory
-add_subdirectory(externals/openal-soft-fork)
+add_subdirectory(externals/openal-soft)
 
 # Set OpenAL variables for Alure's find_package to succeed
-# openal-soft-fork creates a target 'OpenAL' that we can reference
+# openal-soft creates a target 'OpenAL' that we can reference
 set(OPENAL_LIBRARY OpenAL)
-set(OPENAL_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/externals/openal-soft-fork/include)
+set(OPENAL_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/externals/openal-soft/include)
 set(OPENAL_FOUND TRUE)
+
+option(ENABLE_EXTERNAL_LIBS "Enable external libraries" ON)
 
 # Alure requires libSndFile
 # Configure libsndfile to build as shared library
 set(BUILD_SHARED_LIBS ON)
-add_subdirectory(externals/libsndfile-fork)
+add_subdirectory(externals/libsndfile)
 # Reset BUILD_SHARED_LIBS to avoid affecting other dependencies
 set(BUILD_SHARED_LIBS OFF)
 
 # Set SndFile variables for Alure's find_package to succeed
-# libsndfile-fork creates a target 'sndfile' that we can reference
+# libsndfile creates a target 'sndfile' that we can reference
 set(SNDFILE_LIBRARY sndfile)
 set(SNDFILE_LIBRARIES sndfile)
-set(SNDFILE_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/externals/libsndfile-fork/include)
-set(SNDFILE_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/externals/libsndfile-fork/include)
+set(SNDFILE_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/externals/libsndfile/include)
+set(SNDFILE_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/externals/libsndfile/include)
 set(SNDFILE_FOUND TRUE)
 
 # MetaAudio requires Alure

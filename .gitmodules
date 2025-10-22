@@ -8,9 +8,12 @@
 [submodule "externals/MetaHookSv"]
 	path = externals/MetaHookSv
 	url = https://github.com/hzqst/MetaHookSv
-[submodule "externals/libsndfile-fork"]
-	path = externals/libsndfile-fork
-	url = https://github.com/hzqst/libsndfile-fork
-[submodule "externals/openal-soft-fork"]
-	path = externals/openal-soft-fork
-	url = https://github.com/hzqst/openal-soft-fork
+[submodule "externals/ogg"]
+	path = externals/ogg
+	url = https://github.com/xiph/ogg
+[submodule "externals/libsndfile"]
+	path = externals/libsndfile
+	url = https://github.com/libsndfile/libsndfile
+[submodule "externals/openal-soft"]
+	path = externals/openal-soft
+	url = https://github.com/kcat/openal-soft
