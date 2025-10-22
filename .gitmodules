@@ -17,3 +17,12 @@
 [submodule "externals/openal-soft"]
 	path = externals/openal-soft
 	url = https://github.com/kcat/openal-soft
+[submodule "externals/flac"]
+	path = externals/flac
+	url = https://github.com/xiph/flac
+[submodule "externals/opus"]
+	path = externals/opus
+	url = https://github.com/xiph/opus
+[submodule "externals/vorbis"]
+	path = externals/vorbis
+	url = https://github.com/xiph/vorbis
