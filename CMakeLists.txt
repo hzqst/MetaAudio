@@ -102,12 +102,26 @@ target_include_directories(MetaAudio
         ${PROJECT_SOURCE_DIR}/externals/MetaHookSv/thirdparty/capstone_fork/include/capstone
 )
 
-# Alure requires OpenAL
-set(OPENAL_BINARY ${PROJECT_SOURCE_DIR}/externals/OpenAL-SDK/bin/Win32/OpenAL32.dll)
-set(OPENAL_LIBRARY ${PROJECT_SOURCE_DIR}/externals/OpenAL-SDK/libs/Win32/OpenAL32.lib)
-set(OPENAL_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/externals/OpenAL-SDK/include)
+# MetaAudio requires OpenAL
+# Configure OpenAL-Soft options before adding subdirectory
+option(ALSOFT_UTILS "Build utility programs" OFF)
+option(ALSOFT_NO_CONFIG_UTIL "Disable building the alsoft-config utility" ON)
+option(ALSOFT_EXAMPLES "Build example programs" OFF)
+option(ALSOFT_TESTS "Build test programs" OFF)
+option(ALSOFT_INSTALL "Install main library" OFF)
+option(ALSOFT_INSTALL_CONFIG "Install alsoft.conf sample configuration file" OFF)
+option(ALSOFT_INSTALL_HRTF_DATA "Install HRTF data files" OFF)
+option(ALSOFT_INSTALL_AMBDEC_PRESETS "Install AmbDec preset files" OFF)
+option(ALSOFT_INSTALL_EXAMPLES "Install example programs" OFF)
 
-find_package(OpenAL REQUIRED)
+# Add OpenAL-Soft as subdirectory
+add_subdirectory(externals/openal-soft-fork)
+
+# Set OpenAL variables for Alure's find_package to succeed
+# openal-soft-fork creates a target 'OpenAL' that we can reference
+set(OPENAL_LIBRARY OpenAL)
+set(OPENAL_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/externals/openal-soft-fork/include)
+set(OPENAL_FOUND TRUE)
 
 # Alure requires libSndFile
 # Configure libsndfile to build as shared library
@@ -135,19 +149,14 @@ if ((MSVC) AND (MSVC_VERSION GREATER_EQUAL 1914))
 endif()
 
 # Ensure proper build order dependencies
-add_dependencies(${ALURE2_LIBRARY} sndfile)
+add_dependencies(${ALURE2_LIBRARY} OpenAL sndfile)
 add_dependencies(MetaAudio ${ALURE2_LIBRARY})
 
-target_link_libraries(MetaAudio PRIVATE ${OPENAL_LIBRARY} ${ALURE2_LIBRARY} sndfile)
+target_link_libraries(MetaAudio PRIVATE OpenAL ${ALURE2_LIBRARY} sndfile)
 
-# Install MetaAudio.dll, libsndfile.dll and OpenAL32.dll to bin directory
-install(TARGETS MetaAudio sndfile
+# Install MetaAudio.dll, libsndfile.dll and OpenAL.dll to bin directory
+install(TARGETS MetaAudio OpenAL sndfile
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
-)
-
-# Install OpenAL32.dll
-install(FILES ${OPENAL_BINARY}
-    DESTINATION bin
 )

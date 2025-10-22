@@ -8,6 +8,7 @@ This is a fork of MetaAudio, a GoldSrc plugin that adds OpenAL support to its so
 Thus we now have HRTF and surround sound back to our beloved GoldSrc games, and, as this plugin hooks directly into the engine, most mods should work with the new system.
 
 Working games and mods:
+
 - Half-Life
 - Half-Life: Opposing Force
 - Half-Life: Blue Shift
@@ -18,6 +19,15 @@ Working games and mods:
 - SvEngine (Sven Co-op has it's own sound engine integrated in the client dll, so theoretically MetaAudio won't affect anything unless you install some third-party mods into SvEngine)
 
 ... and possibly more!
+
+Working engine:
+
+- GoldSrc 3266
+- GoldSrc 4554
+- GoldSrc 6153
+- GoldSrc 8684 (Pre-25th)
+- GoldSrc 10240 (HL25th)
+- SvEngine 10257
 
 # What works
 - Sound positioning
@@ -70,7 +80,8 @@ Example folder structure, where <game> can be "valve", "cstrike", "ns", "gearbox
       |----> MetaAudio.dll
     |----> dlls\
       |----> sndfile.dll
-      |----> OpenAL32.dll (remove to use X-Fi hardware acceleration)
+      |----> OpenAL32.dll
+      |----> OpenAL32.dll
     |----> configs\
       |----> plugins.lst
 ```

@@ -11,3 +11,6 @@
 [submodule "externals/libsndfile-fork"]
 	path = externals/libsndfile-fork
 	url = https://github.com/hzqst/libsndfile-fork
+[submodule "externals/openal-soft-fork"]
+	path = externals/openal-soft-fork
+	url = https://github.com/hzqst/openal-soft-fork
