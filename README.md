@@ -80,8 +80,7 @@ Example folder structure, where <game> can be "valve", "cstrike", "ns", "gearbox
       |----> MetaAudio.dll
     |----> dlls\
       |----> sndfile.dll
-      |----> OpenAL32.dll
-      |----> OpenAL32.dll
+      |----> OpenAL32.dll (OpenAL software implemention, remove to use pre-installed  hardware acceleration version of OpenAL from system)
     |----> configs\
       |----> plugins.lst
 ```
@@ -89,6 +88,8 @@ Example folder structure, where <game> can be "valve", "cstrike", "ns", "gearbox
 3. Add a new entry `MetaAudio.dll` in the `plugins.lst`.
 
 * One should load the game through "MetaHook.exe". It is recommended to create a shortcut with at least the following launch options：`-steam -insecure -game <game>`.
+
+* You will have to install the hardware acceleration version of OpenAL from https://www.openal.org/ if you deleted the software implemention one from `dlls\`.
 
 # Known bugs
 
@@ -101,7 +102,7 @@ Example folder structure, where <game> can be "valve", "cstrike", "ns", "gearbox
 
 # Build Requirements
 
-1. [Visual Studio 2017 / 2019 / 2022, with vc141 / vc142 / vc143 toolset](https://visualstudio.microsoft.com/)
+1. [Visual Studio 2022, with vc143 toolset](https://visualstudio.microsoft.com/)
 
 2. [CMake](https://cmake.org/download/)
 
@@ -117,7 +118,7 @@ Example folder structure, where <game> can be "valve", "cstrike", "ns", "gearbox
 
 1. `git clone --recursive <repoUrl>`, where `<repoUrl>` should be the MetaAudio repository URL.
 
-2. Run `externals\MetaHookSv\scripts\debug-(WhateverGameYouWant).bat`, depends on which game you are going to debug with.
+2. Run `externals\MetaHookSv\scripts\debug-<GameName>.bat`, where `<GameName>` should be the game you are going to debug with.
 
 3. Run `scripts\build-MetaAudio-x86-Debug.bat`
 
@@ -125,7 +126,7 @@ Example folder structure, where <game> can be "valve", "cstrike", "ns", "gearbox
 
 * Other games follow the same instruction.
 
-* You should restart Visual Studio IDE to apply changes to debugging profile, if Visual Studio IDE was running.
+* You should restart Visual Studio IDE to apply changes to debugging profile, if Visual Studio IDE was running at the 2nd step.
 
 # Credits
 
