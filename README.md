@@ -80,16 +80,16 @@ Example folder structure, where <game> can be "valve", "cstrike", "ns", "gearbox
       |----> MetaAudio.dll
     |----> dlls\
       |----> sndfile.dll
-      |----> OpenAL32.dll (OpenAL software implemention, remove to use pre-installed  hardware acceleration version of OpenAL from system)
+      |----> OpenAL32.dll (OpenAL software implemention, remove to use pre-installed hardware acceleration version of OpenAL from system)
     |----> configs\
       |----> plugins.lst
 ```
 
 3. Add a new entry `MetaAudio.dll` in the `plugins.lst`.
 
-* One should load the game through "MetaHook.exe". It is recommended to create a shortcut with at least the following launch options：`-steam -insecure -game <game>`.
+* One should start the game through "MetaHook.exe". It is recommended to create a shortcut with at least the following launch options：`-steam -insecure -game <game>`.
 
-* You will have to install the hardware acceleration version of OpenAL from https://www.openal.org/ if you deleted the software implemention one from `dlls\`.
+* You will have to install the hardware acceleration version of OpenAL from https://www.openal.org/ if you removed the software implemention one from `dlls\`.
 
 # Known bugs
 
